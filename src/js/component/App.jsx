@@ -2,21 +2,41 @@ import React, { useEffect, useState } from "react";
 import ItemsList from "./ItemsList.jsx";
 
 
+// // POST  // Creo mi BD y usuario
+// fetch('https://assets.breatheco.de/apis/fake/todos/user/sandra', {
+//     method: "POST",
+//     body: JSON.stringify([{ "label": "Make the bed", "done": false },
+//     { "label": "Walk the dog", "done": false }]),
+//     headers: {
+//       "Content-Type": "application/json"
+//     }
+//   })
+//   .then(resp => {
+//       console.log("Ha funcionado!!!");
+//   })
+//   .catch(error => {
+//       //manejo de errores
+//       console.log("ERROR");
+//   });
+
+
 function App() {
     const [inputText, setInputText] = useState("");  //String vacío que contiene el texto del campo de entrada de la app.
     const [items, setItems] = useState([]);          //Array vacío que contendrá los elementos de la lista de tareas.
     const [erase, setErase] = useState();
 
+
+    // GET  // Traigo info de la BD
     useEffect(() => {
-        if (erase) {
-            let newArray = items.filter((element) => element.id != erase);
-            setItems(newArray);
-        }
-    }, [erase]);
+        fetch("https://assets.breatheco.de/apis/fake/todos/user/sandra")
+            .then(res => res.json())
+            .then(res => setItems(res))
+    }, []);
 
 
+    // PUT  // Añado tareas a mi app y a la BD
     useEffect(() => {
-        if(!items.length) return
+        if (!items.length) return
         fetch("https://assets.breatheco.de/apis/fake/todos/user/sandra", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
@@ -31,30 +51,14 @@ function App() {
             )
     }, [items])
 
-useEffect(() =>{
-    fetch("https://assets.breatheco.de/apis/fake/todos/user/sandra")
-    .then(res => res.json())
-    .then(res => setItems(res))
-} ,[]);
 
-
-
-
-    // fetch('https://assets.breatheco.de/apis/fake/todos/user/sandra', {
-    //     method: "POST",
-    //     body: JSON.stringify([]),
-    //     headers: {
-    //       "Content-Type": "application/json"
-    //     }
-    //   })
-    //   .then(resp => {
-    //       console.log("Ha funcionado!!!");
-    //   })
-    //   .catch(error => {
-    //       //manejo de errores
-    //       console.log("ERROR");
-    //   });
-
+    // DELETE TASK // Borro una tarea de mi app y de la BD
+    useEffect(() => {
+        if (erase) {
+            let newArray = items.filter((element) => element.id != erase);
+            setItems(newArray);
+        }
+    }, [erase]);
 
 
     const updateText = (e) => {
@@ -67,8 +71,8 @@ useEffect(() =>{
         const newItem = {
             text: `${inputText}`,
             label: "Add a Tarea",
-            done: false, 
-            id: (Math.random()*20).toFixed(1)
+            done: false,
+            id: (Math.random() * 20).toFixed(1)
         }
 
         setItems([...items, newItem]);
