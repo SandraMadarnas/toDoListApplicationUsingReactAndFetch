@@ -24,6 +24,8 @@ function App() {
     const [inputText, setInputText] = useState("");  //String vacío que contiene el texto del campo de entrada de la app.
     const [items, setItems] = useState([]);          //Array vacío que contendrá los elementos de la lista de tareas.
     const [erase, setErase] = useState();
+    const [userName, setUserName] = useState("");
+
 
 
     // GET  // Traigo info de la BD
@@ -61,6 +63,37 @@ function App() {
     }, [erase]);
 
 
+    // AÑADIR O CARGAR USER
+    const handleOpenUser = () => {
+        // Hacemos una petición GET a la API para obtener el usuario
+        fetch(`https://assets.breatheco.de/apis/fake/todos/user/${userName}`)
+            .then((res) => {
+                // Si la respuesta no es exitosa (por ej, el usuario no existe), creamos el usuario
+                if (!res.ok) {
+                    return fetch(
+                        `https://assets.breatheco.de/apis/fake/todos/user/${userName}`,
+                        {
+                            method: "POST",
+                            body: JSON.stringify([]),
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                        }
+                    );
+                }
+                // Si la respuesta es exitosa, regresamos la respuesta original
+                return res;
+            })
+            .then((res) => res.json())
+            // Actualizamos el estado de los items con la lista de tareas del usuario obtenido
+            .then((data) => setItems(data))
+            .catch((err) => {
+                console.log("ERROR");
+            });
+    };
+
+
+
     const updateText = (e) => {
         setInputText(e.target.value);
     }
@@ -78,7 +111,6 @@ function App() {
         setItems([...items, newItem]);
         setInputText("");
         console.log(items);
-
     };
 
 
@@ -91,7 +123,9 @@ function App() {
                     <button className="app-submit" title="Add task"><i className="fas fa-plus"></i></button>
                 </form>
                 <ItemsList listaDeTareas={items} onDelete={setErase} />
-                <button className="btn btn-danger"> DELETE ALL TASKS </button>
+                <input className="app-input" placeholder="User..." />
+                <button className="btn btn-danger" onClick={handleOpenUser}>Open/Load User</button>
+                {/* <button className="btn btn-danger"> DELETE ALL TASKS </button> */}
                 <footer className="app-foot">
                     <p>Made with ❤️ by Sandra </p>
                 </footer>
